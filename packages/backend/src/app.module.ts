@@ -19,6 +19,10 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { ShipmentModule } from './modules/shipment/shipment.module';
 import { ForecastModule } from './modules/forecast/forecast.module';
 import { CampaignModule } from './modules/campaign/campaign.module';
+import { LifecycleModule } from './modules/lifecycle/lifecycle.module';
+import { ChannelModule } from './modules/channel/channel.module';
+import { ReconciliationModule } from './modules/reconciliation/reconciliation.module';
+import { ABTestModule } from './modules/abtest/abtest.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { OperationLogInterceptor } from './common/interceptors/operation-log.interceptor';
@@ -58,6 +62,10 @@ import { OperationLogInterceptor } from './common/interceptors/operation-log.int
     ShipmentModule,
     ForecastModule,
     CampaignModule,
+    LifecycleModule,
+    ChannelModule,
+    ReconciliationModule,
+    ABTestModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: HttpExceptionFilter },

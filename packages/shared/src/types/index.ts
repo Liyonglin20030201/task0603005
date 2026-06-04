@@ -221,3 +221,218 @@ export interface ForecastInfo {
   recommendedReorder: number;
   confidence: 'high' | 'medium' | 'low';
 }
+
+export interface ProductLifecycleInfo {
+  id: number;
+  productId: number;
+  productName?: string;
+  productSku?: string;
+  currentStage: string;
+  stageHistory: { stage: string; enteredAt: string; operatorId: number; remark?: string }[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductBatchInfo {
+  id: number;
+  productId: number;
+  productName?: string;
+  batchNo: string;
+  quantity: number;
+  remainingQuantity: number;
+  costPrice: number;
+  supplier: string;
+  productionDate: string;
+  expirationDate: string | null;
+  status: string;
+  qualityScore: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface QualityRecordInfo {
+  id: number;
+  productId: number;
+  productName?: string;
+  batchId: number | null;
+  batchNo?: string;
+  checkType: string;
+  result: string;
+  score: number;
+  inspector: string;
+  checkItems: { item: string; standard: string; actual: string; passed: boolean }[];
+  remark: string;
+  attachments: string[];
+  checkedAt: string;
+  createdAt: string;
+}
+
+export interface ReconciliationInfo {
+  id: number;
+  platform: string;
+  periodStart: string;
+  periodEnd: string;
+  totalOrders: number;
+  matchedOrders: number;
+  discrepancyOrders: number;
+  platformAmount: number;
+  localAmount: number;
+  differenceAmount: number;
+  status: string;
+  reconciledAt: string | null;
+  operatorId: number | null;
+  operatorName?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ReconciliationDetailInfo {
+  id: number;
+  reconciliationId: number;
+  platformOrderNo: string;
+  localOrderNo: string | null;
+  platformAmount: number;
+  localAmount: number;
+  differenceAmount: number;
+  differenceReason: string | null;
+  status: string;
+  resolvedAt: string | null;
+  remark: string | null;
+}
+
+export interface SettlementInfo {
+  id: number;
+  platform: string;
+  settlementNo: string;
+  periodStart: string;
+  periodEnd: string;
+  grossAmount: number;
+  totalFees: number;
+  netAmount: number;
+  orderCount: number;
+  refundCount: number;
+  refundAmount: number;
+  feeBreakdown: { type: string; amount: number; rate?: number }[];
+  status: string;
+  settledAt: string | null;
+  bankAccount: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FeeRuleInfo {
+  id: number;
+  platform: string;
+  feeType: string;
+  rate: number;
+  fixedAmount: number;
+  minAmount: number;
+  maxAmount: number;
+  effectiveFrom: string;
+  effectiveTo: string | null;
+  status: number;
+  createdAt: string;
+}
+
+export interface ChannelInfo {
+  id: number;
+  name: string;
+  platform: string;
+  appKey: string;
+  status: number;
+  syncEnabled: boolean;
+  lastSyncAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ChannelOrderInfo {
+  id: number;
+  channelId: number;
+  channelName?: string;
+  platform: string;
+  platformOrderNo: string;
+  localOrderId: number | null;
+  localOrderNo: string | null;
+  buyerNickname: string;
+  totalAmount: number;
+  payAmount: number;
+  itemCount: number;
+  platformStatus: string;
+  syncStatus: string;
+  syncedAt: string | null;
+  failReason: string | null;
+  platformCreatedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ABTestInfo {
+  id: number;
+  name: string;
+  type: string;
+  status: string;
+  hypothesis: string;
+  primaryMetric: string;
+  secondaryMetrics: string[];
+  startDate: string | null;
+  endDate: string | null;
+  targetSampleSize: number;
+  currentSampleSize: number;
+  confidenceLevel: number;
+  variants: ABTestVariantInfo[];
+  winnerVariantId: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ABTestVariantInfo {
+  id: number;
+  testId: number;
+  name: string;
+  description: string;
+  trafficPercent: number;
+  isControl: boolean;
+  config: object;
+  impressions: number;
+  conversions: number;
+  revenue: number;
+  conversionRate: number;
+  confidenceInterval: { lower: number; upper: number } | null;
+}
+
+export interface ABTestEventInfo {
+  id: number;
+  testId: number;
+  variantId: number;
+  eventType: string;
+  userId: string;
+  sessionId: string;
+  value: number | null;
+  metadata: object | null;
+  createdAt: string;
+}
+
+export interface ABTestReportInfo {
+  testId: number;
+  testName: string;
+  status: string;
+  duration: number;
+  totalSampleSize: number;
+  variants: {
+    id: number;
+    name: string;
+    isControl: boolean;
+    impressions: number;
+    conversions: number;
+    conversionRate: number;
+    revenue: number;
+    avgOrderValue: number;
+    improvement: number;
+    pValue: number;
+    isSignificant: boolean;
+    confidenceInterval: { lower: number; upper: number };
+  }[];
+  recommendation: string;
+  dailyData: { date: string; variantId: number; variantName: string; impressions: number; conversions: number; conversionRate: number }[];
+}

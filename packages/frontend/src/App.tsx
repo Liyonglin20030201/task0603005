@@ -20,6 +20,11 @@ import ForecastList from './pages/forecast/ForecastList';
 import CampaignList from './pages/campaign/CampaignList';
 import CampaignForm from './pages/campaign/CampaignForm';
 import CampaignDetail from './pages/campaign/CampaignDetail';
+import ChannelList from './pages/channel/ChannelList';
+import ReconciliationList from './pages/reconciliation/ReconciliationList';
+import ABTestList from './pages/abtest/ABTestList';
+import ABTestForm from './pages/abtest/ABTestForm';
+import ABTestDetail from './pages/abtest/ABTestDetail';
 import AuthGuard from './components/AuthGuard';
 
 function App() {
@@ -56,6 +61,12 @@ function App() {
         <Route path="campaigns/create" element={<CampaignForm />} />
         <Route path="campaigns/:id/edit" element={<CampaignForm />} />
         <Route path="campaigns/:id" element={<CampaignDetail />} />
+        <Route path="channels" element={<ChannelList />} />
+        <Route path="reconciliation" element={<ReconciliationList />} />
+        <Route path="ab-tests" element={<ABTestList />} />
+        <Route path="ab-tests/create" element={<ABTestForm />} />
+        <Route path="ab-tests/:id/edit" element={<ABTestForm />} />
+        <Route path="ab-tests/:id" element={<ABTestDetail />} />
       </Route>
     </Routes>
   );

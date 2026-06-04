@@ -20,6 +20,8 @@ import {
   CarOutlined,
   ThunderboltOutlined,
   BellOutlined,
+  AccountBookOutlined,
+  ExperimentOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from '../store/auth';
 import NotificationBell from '../components/NotificationBell';
@@ -37,6 +39,8 @@ const menuItems = [
   { key: '/users', icon: <UserOutlined />, label: '用户管理' },
   { key: '/coupons', icon: <GiftOutlined />, label: '优惠券管理' },
   { key: '/campaigns', icon: <ThunderboltOutlined />, label: '营销活动' },
+  { key: '/ab-tests', icon: <ExperimentOutlined />, label: 'A/B测试' },
+  { key: '/reconciliation', icon: <AccountBookOutlined />, label: '财务对账' },
   { key: '/notifications', icon: <BellOutlined />, label: '消息通知' },
   { key: '/admins', icon: <TeamOutlined />, label: '管理员管理' },
   { key: '/roles', icon: <SafetyOutlined />, label: '角色管理' },

@@ -139,3 +139,76 @@ export const campaignApi = {
   pause: (id: number) => request.put(`/campaigns/${id}/pause`),
   end: (id: number) => request.put(`/campaigns/${id}/end`),
 };
+
+export const lifecycleApi = {
+  list: (params: any) => request.get('/lifecycles', { params }),
+  detail: (productId: number) => request.get(`/lifecycles/${productId}`),
+  transition: (productId: number, data: { stage: string; remark?: string }) =>
+    request.put(`/lifecycles/${productId}/transition`, data),
+};
+
+export const batchApi = {
+  list: (params: any) => request.get('/batches', { params }),
+  detail: (id: number) => request.get(`/batches/${id}`),
+  create: (data: any) => request.post('/batches', data),
+  update: (id: number, data: any) => request.put(`/batches/${id}`, data),
+  trace: (traceCode: string) => request.get(`/batches/trace/${traceCode}`),
+};
+
+export const qualityApi = {
+  list: (params: any) => request.get('/quality-records', { params }),
+  detail: (id: number) => request.get(`/quality-records/${id}`),
+  create: (data: any) => request.post('/quality-records', data),
+};
+
+export const channelApi = {
+  list: (params?: any) => request.get('/channels', { params }),
+  detail: (id: number) => request.get(`/channels/${id}`),
+  create: (data: any) => request.post('/channels', data),
+  update: (id: number, data: any) => request.put(`/channels/${id}`, data),
+  delete: (id: number) => request.delete(`/channels/${id}`),
+  sync: (id: number) => request.post(`/channels/${id}/sync`),
+  syncAll: () => request.post('/channels/sync-all'),
+};
+
+export const channelOrderApi = {
+  list: (params: any) => request.get('/channel-orders', { params }),
+  match: (id: number) => request.post(`/channel-orders/${id}/match`),
+};
+
+export const reconciliationApi = {
+  list: (params: any) => request.get('/reconciliations', { params }),
+  detail: (id: number) => request.get(`/reconciliations/${id}`),
+  create: (data: any) => request.post('/reconciliations', data),
+  execute: (id: number) => request.post(`/reconciliations/${id}/execute`),
+  resolveDetail: (detailId: number, data: any) => request.put(`/reconciliations/details/${detailId}/resolve`, data),
+  dashboard: () => request.get('/reconciliations/dashboard'),
+};
+
+export const settlementApi = {
+  list: (params: any) => request.get('/settlements', { params }),
+  detail: (id: number) => request.get(`/settlements/${id}`),
+  create: (data: any) => request.post('/settlements', data),
+  update: (id: number, data: any) => request.put(`/settlements/${id}`, data),
+};
+
+export const feeRuleApi = {
+  list: (params?: any) => request.get('/fee-rules', { params }),
+  create: (data: any) => request.post('/fee-rules', data),
+  update: (id: number, data: any) => request.put(`/fee-rules/${id}`, data),
+};
+
+export const abTestApi = {
+  list: (params: any) => request.get('/ab-tests', { params }),
+  detail: (id: number) => request.get(`/ab-tests/${id}`),
+  create: (data: any) => request.post('/ab-tests', data),
+  update: (id: number, data: any) => request.put(`/ab-tests/${id}`, data),
+  delete: (id: number) => request.delete(`/ab-tests/${id}`),
+  start: (id: number) => request.post(`/ab-tests/${id}/start`),
+  pause: (id: number) => request.post(`/ab-tests/${id}/pause`),
+  complete: (id: number) => request.post(`/ab-tests/${id}/complete`),
+  archive: (id: number) => request.post(`/ab-tests/${id}/archive`),
+  recordEvent: (data: any) => request.post('/ab-tests/events', data),
+  report: (id: number) => request.get(`/ab-tests/${id}/report`),
+  dashboard: () => request.get('/ab-tests/dashboard/summary'),
+};
