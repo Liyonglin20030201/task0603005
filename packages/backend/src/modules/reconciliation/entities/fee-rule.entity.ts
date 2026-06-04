@@ -31,7 +31,7 @@ export class FeeRule {
   effectiveFrom: Date;
 
   @Column({ name: 'effective_to', type: 'date', nullable: true })
-  effectiveTo: Date;
+  effectiveTo: Date | null;
 
   @Column({ default: 1 })
   status: number;

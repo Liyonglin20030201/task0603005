@@ -30,7 +30,7 @@ export class ChannelOrder {
   localOrderId: number;
 
   @Column({ name: 'local_order_no', length: 32, nullable: true })
-  localOrderNo: string;
+  localOrderNo: string | null;
 
   @Column({ name: 'buyer_nickname', length: 100 })
   buyerNickname: string;
@@ -62,7 +62,7 @@ export class ChannelOrder {
   syncedAt: Date;
 
   @Column({ name: 'fail_reason', type: 'text', nullable: true })
-  failReason: string;
+  failReason: string | null;
 
   @Column({ name: 'platform_created_at', type: 'datetime' })
   platformCreatedAt: Date;

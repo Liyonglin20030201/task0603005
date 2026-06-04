@@ -13,7 +13,7 @@ export class ReconciliationDetail {
   platformOrderNo: string;
 
   @Column({ name: 'local_order_no', length: 100, nullable: true })
-  localOrderNo: string;
+  localOrderNo: string | null;
 
   @Column({ name: 'platform_amount', type: 'decimal', precision: 10, scale: 2, default: 0 })
   platformAmount: number;
@@ -25,7 +25,7 @@ export class ReconciliationDetail {
   differenceAmount: number;
 
   @Column({ name: 'difference_reason', type: 'text', nullable: true })
-  differenceReason: string;
+  differenceReason: string | null;
 
   @Column({
     type: 'enum',
@@ -35,10 +35,10 @@ export class ReconciliationDetail {
   status: string;
 
   @Column({ name: 'resolved_at', type: 'datetime', nullable: true })
-  resolvedAt: Date;
+  resolvedAt: Date | null;
 
   @Column({ type: 'text', nullable: true })
-  remark: string;
+  remark: string | null;
 
   @ManyToOne(() => Reconciliation, (r) => r.details)
   @JoinColumn({ name: 'reconciliation_id' })

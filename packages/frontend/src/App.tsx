@@ -21,6 +21,7 @@ import CampaignList from './pages/campaign/CampaignList';
 import CampaignForm from './pages/campaign/CampaignForm';
 import CampaignDetail from './pages/campaign/CampaignDetail';
 import ChannelList from './pages/channel/ChannelList';
+import LifecycleList from './pages/lifecycle/LifecycleList';
 import ReconciliationList from './pages/reconciliation/ReconciliationList';
 import ABTestList from './pages/abtest/ABTestList';
 import ABTestForm from './pages/abtest/ABTestForm';
@@ -62,6 +63,7 @@ function App() {
         <Route path="campaigns/:id/edit" element={<CampaignForm />} />
         <Route path="campaigns/:id" element={<CampaignDetail />} />
         <Route path="channels" element={<ChannelList />} />
+        <Route path="lifecycle" element={<LifecycleList />} />
         <Route path="reconciliation" element={<ReconciliationList />} />
         <Route path="ab-tests" element={<ABTestList />} />
         <Route path="ab-tests/create" element={<ABTestForm />} />

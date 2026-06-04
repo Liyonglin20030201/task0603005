@@ -46,10 +46,10 @@ export class Settlement {
   status: string;
 
   @Column({ name: 'settled_at', type: 'datetime', nullable: true })
-  settledAt: Date;
+  settledAt: Date | null;
 
   @Column({ name: 'bank_account', length: 200, nullable: true })
-  bankAccount: string;
+  bankAccount: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
