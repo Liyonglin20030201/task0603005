@@ -17,7 +17,7 @@ export class ShipmentService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async create(dto: CreateShipmentDto): Promise<Shipment> {
+  async create(dto: CreateShipmentDto, operatorId?: number): Promise<Shipment> {
     const existing = await this.shipmentRepo.findOne({ where: { orderId: dto.orderId } });
     if (existing) {
       throw new ConflictException('该订单已有物流信息');
@@ -36,7 +36,7 @@ export class ShipmentService {
     shipment.carrier = dto.carrier;
     shipment.status = 'pending';
     shipment.estimatedDelivery = dto.estimatedDelivery ? new Date(dto.estimatedDelivery) : undefined as any;
-    shipment.statusHistory = [{ status: 'pending', location: '', time: now, description: '物流单已创建' }];
+    shipment.statusHistory = [{ status: 'pending', location: '', time: now, description: '物流单已创建', operatorId: operatorId || null }];
 
     const saved = await this.shipmentRepo.save(shipment);
 

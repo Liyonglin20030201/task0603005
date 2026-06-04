@@ -43,8 +43,8 @@ export class ShipmentController {
   @RequirePermission(PERMISSIONS.SHIPMENT_CREATE)
   @OperationLogMeta('shipment', 'create')
   @ApiOperation({ summary: '创建物流' })
-  create(@Body() dto: CreateShipmentDto) {
-    return this.shipmentService.create(dto);
+  create(@Body() dto: CreateShipmentDto, @CurrentAdmin('id') adminId: number) {
+    return this.shipmentService.create(dto, adminId);
   }
 
   @Put(':id/tracking')

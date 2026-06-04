@@ -76,11 +76,17 @@ export class NotificationService {
   }
 
   async markRead(adminId: number, dto: MarkReadDto): Promise<void> {
+    const adminRole = await this.getAdminRole(adminId);
+
     await this.notificationRepo
       .createQueryBuilder()
       .update()
       .set({ isRead: true })
       .where('id IN (:...ids)', { ids: dto.ids })
+      .andWhere(
+        '(recipient_id = :adminId OR (recipient_id IS NULL AND recipient_role IS NULL) OR recipient_role = :role)',
+        { adminId, role: adminRole },
+      )
       .execute();
   }
 
