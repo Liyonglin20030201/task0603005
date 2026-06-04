@@ -180,6 +180,11 @@ export class ChannelService {
       channelOrder.nextRetryAt = new Date(Date.now() + backoffMinutes * 60 * 1000);
       await this.channelOrderRepo.save(channelOrder);
 
+      this.logger.warn(
+        `渠道订单 ${channelOrder.platformOrderNo} 同步失败，已重试${channelOrder.retryCount}次，` +
+        `下次重试时间: ${channelOrder.nextRetryAt.toISOString()}`,
+      );
+
       throw new BadRequestException(`订单同步失败: ${error.message}`);
     }
   }
@@ -197,12 +202,33 @@ export class ChannelService {
     const retryable = failedOrders.filter((o) => o.retryCount < MAX_RETRY_COUNT);
 
     for (const order of retryable) {
+      const attemptNumber = order.retryCount + 1;
       try {
         await this.matchOrder(order.id);
-        this.logger.log(`渠道订单 ${order.platformOrderNo} 重试成功`);
-      } catch {
+        // Record successful retry in history
+        const updated = await this.channelOrderRepo.findOne({ where: { id: order.id } });
+        if (updated) {
+          updated.retryHistory = [
+            ...(updated.retryHistory || []),
+            { attempt: attemptNumber, at: new Date().toISOString(), success: true },
+          ];
+          await this.channelOrderRepo.save(updated);
+        }
+        this.logger.log(`渠道订单 ${order.platformOrderNo} 第${attemptNumber}次重试成功`);
+      } catch (err: any) {
+        // matchOrder already increments retryCount and sets nextRetryAt on failure,
+        // append to retry history
+        const updated = await this.channelOrderRepo.findOne({ where: { id: order.id } });
+        if (updated) {
+          updated.retryHistory = [
+            ...(updated.retryHistory || []),
+            { attempt: attemptNumber, at: new Date().toISOString(), success: false, reason: err.message },
+          ];
+          await this.channelOrderRepo.save(updated);
+        }
         this.logger.warn(
-          `渠道订单 ${order.platformOrderNo} 重试失败 (${order.retryCount}/${MAX_RETRY_COUNT})`,
+          `渠道订单 ${order.platformOrderNo} 第${attemptNumber}次重试失败 (${attemptNumber}/${MAX_RETRY_COUNT})，` +
+          `下次重试: ${updated?.nextRetryAt?.toISOString() || '无'}`,
         );
       }
     }

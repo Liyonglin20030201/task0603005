@@ -70,6 +70,9 @@ export class ChannelOrder {
   @Column({ name: 'next_retry_at', type: 'datetime', nullable: true })
   nextRetryAt: Date | null;
 
+  @Column({ name: 'retry_history', type: 'json', nullable: true })
+  retryHistory: { attempt: number; at: string; success: boolean; reason?: string }[];
+
   @Column({ name: 'platform_created_at', type: 'datetime' })
   platformCreatedAt: Date;
 

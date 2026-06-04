@@ -6,6 +6,7 @@ import {
   InventoryLowStockEvent,
   OrderStatusChangedEvent,
   CampaignStatusChangedEvent,
+  ReconciliationResolvedEvent,
 } from './notification.events';
 
 @Injectable()
@@ -45,6 +46,18 @@ export class NotificationListener {
       level: 'info',
       recipientRole: 'admin',
       metadata: { campaignId: event.campaignId },
+    });
+  }
+
+  @OnEvent(NOTIFICATION_EVENTS.RECONCILIATION_RESOLVED, { async: true })
+  async handleReconciliationResolved(event: ReconciliationResolvedEvent) {
+    await this.notificationService.create({
+      type: 'system',
+      title: '对账差异已处理',
+      content: `对账明细（平台订单号 ${event.platformOrderNo}）已由「${event.operatorName}」处理${event.remark ? '，备注: ' + event.remark : ''}`,
+      level: 'info',
+      recipientRole: 'admin',
+      metadata: { detailId: event.detailId, reconciliationId: event.reconciliationId, operatorId: event.operatorId },
     });
   }
 }

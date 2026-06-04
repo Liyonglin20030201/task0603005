@@ -226,6 +226,16 @@ export class OrderService {
         order.cancelReason = dto.reason || '';
         for (const item of order.items) {
           await this.inventoryService.unlockStock(item.productId, item.quantity, order.id);
+          if (item.batchId) {
+            const batch = await this.batchRepo.findOne({ where: { id: item.batchId } });
+            if (batch) {
+              batch.remainingQuantity += item.quantity;
+              if (batch.status === 'depleted') {
+                batch.status = 'active' as any;
+              }
+              await this.batchRepo.save(batch);
+            }
+          }
         }
         if (order.couponId) {
           await this.userCouponRepo.update(

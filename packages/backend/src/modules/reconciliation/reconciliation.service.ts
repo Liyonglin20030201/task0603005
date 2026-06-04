@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Reconciliation } from './entities/reconciliation.entity';
 import { ReconciliationDetail } from './entities/reconciliation-detail.entity';
 import { Settlement } from './entities/settlement.entity';
@@ -12,6 +13,7 @@ import { CreateSettlementDto } from './dto/create-settlement.dto';
 import { UpdateSettlementDto } from './dto/update-settlement.dto';
 import { QuerySettlementDto } from './dto/query-settlement.dto';
 import { CreateFeeRuleDto } from './dto/create-fee-rule.dto';
+import { NOTIFICATION_EVENTS } from '../notification/notification.events';
 
 @Injectable()
 export class ReconciliationService {
@@ -24,6 +26,7 @@ export class ReconciliationService {
     private readonly settlementRepo: Repository<Settlement>,
     @InjectRepository(FeeRule)
     private readonly feeRuleRepo: Repository<FeeRule>,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async createReconciliation(dto: CreateReconciliationDto, operatorId: number) {
@@ -164,6 +167,15 @@ export class ReconciliationService {
     detail.operatorId = operatorId;
     detail.operatorName = operatorName;
     await this.detailRepo.save(detail);
+
+    this.eventEmitter.emit(NOTIFICATION_EVENTS.RECONCILIATION_RESOLVED, {
+      detailId: detail.id,
+      reconciliationId: detail.reconciliationId,
+      platformOrderNo: detail.platformOrderNo,
+      operatorId,
+      operatorName,
+      remark: detail.remark,
+    });
 
     // Check if all details of the reconciliation are resolved
     const reconciliation = await this.reconciliationRepo.findOne({
