@@ -64,6 +64,12 @@ export class ChannelOrder {
   @Column({ name: 'fail_reason', type: 'text', nullable: true })
   failReason: string | null;
 
+  @Column({ name: 'retry_count', default: 0 })
+  retryCount: number;
+
+  @Column({ name: 'next_retry_at', type: 'datetime', nullable: true })
+  nextRetryAt: Date | null;
+
   @Column({ name: 'platform_created_at', type: 'datetime' })
   platformCreatedAt: Date;
 

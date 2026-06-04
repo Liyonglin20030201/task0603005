@@ -149,7 +149,7 @@ export class ReconciliationService {
     return reconciliation;
   }
 
-  async resolveDetail(detailId: number, dto: ResolveDetailDto) {
+  async resolveDetail(detailId: number, dto: ResolveDetailDto, operatorId: number, operatorName: string) {
     const detail = await this.detailRepo.findOne({ where: { id: detailId } });
     if (!detail) {
       throw new NotFoundException('对账明细不存在');
@@ -161,6 +161,8 @@ export class ReconciliationService {
     detail.status = dto.status || 'resolved';
     detail.remark = dto.remark || null;
     detail.resolvedAt = new Date();
+    detail.operatorId = operatorId;
+    detail.operatorName = operatorName;
     await this.detailRepo.save(detail);
 
     // Check if all details of the reconciliation are resolved

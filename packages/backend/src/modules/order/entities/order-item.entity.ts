@@ -30,4 +30,7 @@ export class OrderItem {
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   subtotal: number;
+
+  @Column({ name: 'batch_id', nullable: true })
+  batchId: number | null;
 }

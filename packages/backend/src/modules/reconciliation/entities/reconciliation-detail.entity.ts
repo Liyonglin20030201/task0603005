@@ -40,6 +40,12 @@ export class ReconciliationDetail {
   @Column({ type: 'text', nullable: true })
   remark: string | null;
 
+  @Column({ name: 'operator_id', nullable: true })
+  operatorId: number | null;
+
+  @Column({ name: 'operator_name', length: 100, nullable: true })
+  operatorName: string | null;
+
   @ManyToOne(() => Reconciliation, (r) => r.details)
   @JoinColumn({ name: 'reconciliation_id' })
   reconciliation: Reconciliation;

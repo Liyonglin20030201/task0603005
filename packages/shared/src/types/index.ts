@@ -105,6 +105,8 @@ export interface OrderItemInfo {
   price: number;
   quantity: number;
   subtotal: number;
+  batchId?: number | null;
+  batchNo?: string;
 }
 
 export interface CategoryInfo {
@@ -298,6 +300,8 @@ export interface ReconciliationDetailInfo {
   status: string;
   resolvedAt: string | null;
   remark: string | null;
+  operatorId?: number | null;
+  operatorName?: string | null;
 }
 
 export interface SettlementInfo {

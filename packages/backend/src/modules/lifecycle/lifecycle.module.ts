@@ -10,6 +10,6 @@ import { LifecycleController } from './lifecycle.controller';
   imports: [TypeOrmModule.forFeature([ProductLifecycle, ProductBatch, QualityRecord])],
   controllers: [LifecycleController],
   providers: [LifecycleService],
-  exports: [LifecycleService],
+  exports: [LifecycleService, TypeOrmModule],
 })
 export class LifecycleModule {}

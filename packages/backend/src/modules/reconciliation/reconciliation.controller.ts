@@ -63,8 +63,12 @@ export class ReconciliationController {
   @RequirePermission(PERMISSIONS.RECONCILIATION_UPDATE)
   @OperationLogMeta('reconciliation', 'resolveDetail')
   @ApiOperation({ summary: '处理差异明细' })
-  resolveDetail(@Param('detailId') detailId: number, @Body() dto: ResolveDetailDto) {
-    return this.reconciliationService.resolveDetail(detailId, dto);
+  resolveDetail(
+    @Param('detailId') detailId: number,
+    @Body() dto: ResolveDetailDto,
+    @CurrentAdmin() admin: any,
+  ) {
+    return this.reconciliationService.resolveDetail(detailId, dto, admin.id, admin.nickname || admin.username);
   }
 }
 

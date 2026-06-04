@@ -1,21 +1,28 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, LessThanOrEqual } from 'typeorm';
+import { Cron } from '@nestjs/schedule';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Channel } from './entities/channel.entity';
 import { ChannelOrder } from './entities/channel-order.entity';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
 import { QueryChannelOrderDto } from './dto/query-channel-order.dto';
+import { InventoryService } from '../inventory/inventory.service';
 import { NOTIFICATION_EVENTS } from '../notification/notification.events';
+
+const MAX_RETRY_COUNT = 3;
 
 @Injectable()
 export class ChannelService {
+  private readonly logger = new Logger(ChannelService.name);
+
   constructor(
     @InjectRepository(Channel)
     private readonly channelRepo: Repository<Channel>,
     @InjectRepository(ChannelOrder)
     private readonly channelOrderRepo: Repository<ChannelOrder>,
+    private readonly inventoryService: InventoryService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
@@ -139,15 +146,66 @@ export class ChannelService {
       throw new BadRequestException('该订单已同步');
     }
 
-    // Simulate matching to local order - generate a local order number
-    const localOrderNo = `LO${Date.now()}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
-    channelOrder.localOrderNo = localOrderNo;
-    channelOrder.localOrderId = Math.floor(Math.random() * 10000) + 1;
-    channelOrder.syncStatus = 'synced';
-    channelOrder.syncedAt = new Date();
-    channelOrder.failReason = null;
+    const items = (channelOrder.items || []) as any[];
+    const lockedItems: { productId: number; quantity: number }[] = [];
 
-    return this.channelOrderRepo.save(channelOrder);
+    try {
+      for (const item of items) {
+        if (item.productId && item.quantity) {
+          await this.inventoryService.lockStock(item.productId, item.quantity, 0);
+          lockedItems.push({ productId: item.productId, quantity: item.quantity });
+        }
+      }
+
+      const localOrderNo = `LO${Date.now()}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+      channelOrder.localOrderNo = localOrderNo;
+      channelOrder.localOrderId = Math.floor(Math.random() * 10000) + 1;
+      channelOrder.syncStatus = 'synced';
+      channelOrder.syncedAt = new Date();
+      channelOrder.failReason = null;
+
+      return this.channelOrderRepo.save(channelOrder);
+    } catch (error: any) {
+      // Rollback locked inventory
+      for (const locked of lockedItems) {
+        try {
+          await this.inventoryService.unlockStock(locked.productId, locked.quantity, 0);
+        } catch {}
+      }
+
+      channelOrder.syncStatus = 'failed';
+      channelOrder.failReason = error.message || '库存锁定失败';
+      channelOrder.retryCount = (channelOrder.retryCount || 0) + 1;
+      const backoffMinutes = Math.pow(2, channelOrder.retryCount);
+      channelOrder.nextRetryAt = new Date(Date.now() + backoffMinutes * 60 * 1000);
+      await this.channelOrderRepo.save(channelOrder);
+
+      throw new BadRequestException(`订单同步失败: ${error.message}`);
+    }
+  }
+
+  @Cron('*/2 * * * *')
+  async retryFailedOrders(): Promise<void> {
+    const now = new Date();
+    const failedOrders = await this.channelOrderRepo.find({
+      where: {
+        syncStatus: 'failed',
+        nextRetryAt: LessThanOrEqual(now),
+      },
+    });
+
+    const retryable = failedOrders.filter((o) => o.retryCount < MAX_RETRY_COUNT);
+
+    for (const order of retryable) {
+      try {
+        await this.matchOrder(order.id);
+        this.logger.log(`渠道订单 ${order.platformOrderNo} 重试成功`);
+      } catch {
+        this.logger.warn(
+          `渠道订单 ${order.platformOrderNo} 重试失败 (${order.retryCount}/${MAX_RETRY_COUNT})`,
+        );
+      }
+    }
   }
 
   async batchSync(): Promise<{ total: number; synced: number; failed: number }> {
@@ -188,6 +246,7 @@ export class ChannelService {
         payAmount,
         itemCount,
         items: Array.from({ length: itemCount }, (_, idx) => ({
+          productId: idx + 1,
           name: `商品${idx + 1}`,
           quantity: Math.floor(Math.random() * 3) + 1,
           price: +(Math.random() * 200 + 10).toFixed(2),

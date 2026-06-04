@@ -6,6 +6,7 @@ import { OrderItem } from './entities/order-item.entity';
 import { Product } from '../product/entities/product.entity';
 import { Coupon } from '../coupon/entities/coupon.entity';
 import { UserCoupon } from '../coupon/entities/user-coupon.entity';
+import { ProductBatch } from '../lifecycle/entities/product-batch.entity';
 import { InventoryService } from '../inventory/inventory.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { QueryOrderDto } from './dto/query-order.dto';
@@ -26,6 +27,8 @@ export class OrderService {
     private couponRepo: Repository<Coupon>,
     @InjectRepository(UserCoupon)
     private userCouponRepo: Repository<UserCoupon>,
+    @InjectRepository(ProductBatch)
+    private batchRepo: Repository<ProductBatch>,
     private inventoryService: InventoryService,
     private dataSource: DataSource,
   ) {}
@@ -65,6 +68,21 @@ export class OrderService {
 
         await this.inventoryService.lockStock(product.id, item.quantity, 0);
 
+        // FIFO batch allocation
+        const batch = await this.batchRepo.findOne({
+          where: { productId: product.id, status: 'active' },
+          order: { productionDate: 'ASC' },
+        });
+        let batchId: number | null = null;
+        if (batch && batch.remainingQuantity >= item.quantity) {
+          batch.remainingQuantity -= item.quantity;
+          if (batch.remainingQuantity === 0) {
+            batch.status = 'depleted' as any;
+          }
+          await this.batchRepo.save(batch);
+          batchId = batch.id;
+        }
+
         const subtotal = Number(product.price) * item.quantity;
         totalAmount += subtotal;
 
@@ -75,6 +93,7 @@ export class OrderService {
           price: product.price,
           quantity: item.quantity,
           subtotal,
+          batchId,
         });
       }
 
@@ -231,6 +250,17 @@ export class OrderService {
       case OrderStatus.REFUNDED:
         for (const item of order.items) {
           await this.inventoryService.restoreStock(item.productId, item.quantity, order.id);
+          // Restore batch quantity
+          if (item.batchId) {
+            const batch = await this.batchRepo.findOne({ where: { id: item.batchId } });
+            if (batch) {
+              batch.remainingQuantity += item.quantity;
+              if (batch.status === 'depleted') {
+                batch.status = 'active' as any;
+              }
+              await this.batchRepo.save(batch);
+            }
+          }
         }
         if (order.couponId) {
           await this.userCouponRepo.update(

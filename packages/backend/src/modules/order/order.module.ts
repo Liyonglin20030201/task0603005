@@ -5,6 +5,7 @@ import { OrderController } from './order.controller';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { InventoryModule } from '../inventory/inventory.module';
+import { LifecycleModule } from '../lifecycle/lifecycle.module';
 import { Product } from '../product/entities/product.entity';
 import { Coupon } from '../coupon/entities/coupon.entity';
 import { UserCoupon } from '../coupon/entities/user-coupon.entity';
@@ -13,6 +14,7 @@ import { UserCoupon } from '../coupon/entities/user-coupon.entity';
   imports: [
     TypeOrmModule.forFeature([Order, OrderItem, Product, Coupon, UserCoupon]),
     InventoryModule,
+    LifecycleModule,
   ],
   controllers: [OrderController],
   providers: [OrderService],
