@@ -26,7 +26,7 @@ const ReportDashboard: React.FC = () => {
       const startDate = salesRange[0].format('YYYY-MM-DD');
       const endDate = salesRange[1].format('YYYY-MM-DD');
       const res: any = await reportApi.sales(startDate, endDate);
-      setSalesData(res.data);
+      setSalesData(res);
     } catch {
       message.error('获取销售报表失败');
     } finally {
@@ -38,7 +38,7 @@ const ReportDashboard: React.FC = () => {
     setOrderStatusLoading(true);
     try {
       const res: any = await reportApi.orderStatus();
-      setOrderStatusData(res.data);
+      setOrderStatusData(res);
     } catch {
       message.error('获取订单状态分布失败');
     } finally {
@@ -50,7 +50,7 @@ const ReportDashboard: React.FC = () => {
     setTopProductsLoading(true);
     try {
       const res: any = await reportApi.topProducts(10);
-      setTopProductsData(res.data);
+      setTopProductsData(res);
     } catch {
       message.error('获取热销商品失败');
     } finally {
@@ -62,7 +62,7 @@ const ReportDashboard: React.FC = () => {
     setInventoryLoading(true);
     try {
       const res: any = await reportApi.inventory();
-      setInventoryData(res.data);
+      setInventoryData(res);
     } catch {
       message.error('获取库存报表失败');
     } finally {
@@ -82,7 +82,7 @@ const ReportDashboard: React.FC = () => {
 
   const getSalesOption = () => {
     if (!salesData) return {};
-    const days = salesData.list || salesData || [];
+    const days = Array.isArray(salesData) ? salesData : [];
     return {
       tooltip: { trigger: 'axis' },
       legend: { data: ['订单数', '销售额'] },
@@ -112,7 +112,7 @@ const ReportDashboard: React.FC = () => {
 
   const getOrderStatusOption = () => {
     if (!orderStatusData) return {};
-    const items = orderStatusData.list || orderStatusData || [];
+    const items = Array.isArray(orderStatusData) ? orderStatusData : [];
     return {
       tooltip: { trigger: 'item' },
       legend: { orient: 'vertical', left: 'left' },
@@ -122,8 +122,8 @@ const ReportDashboard: React.FC = () => {
           type: 'pie',
           radius: '60%',
           data: items.map((item: any) => ({
-            name: item.status || item.name,
-            value: item.count || item.value,
+            name: item.status,
+            value: item.count,
           })),
         },
       ],
@@ -132,12 +132,12 @@ const ReportDashboard: React.FC = () => {
 
   const getTopProductsOption = () => {
     if (!topProductsData) return {};
-    const items = topProductsData.list || topProductsData || [];
+    const items = Array.isArray(topProductsData) ? topProductsData : [];
     return {
       tooltip: { trigger: 'axis' },
       xAxis: {
         type: 'category',
-        data: items.map((item: any) => item.productName || item.name),
+        data: items.map((item: any) => item.productName),
         axisLabel: { rotate: 30 },
       },
       yAxis: { type: 'value', name: '销量' },
@@ -145,7 +145,7 @@ const ReportDashboard: React.FC = () => {
         {
           name: '销量',
           type: 'bar',
-          data: items.map((item: any) => item.salesCount || item.count || item.value),
+          data: items.map((item: any) => item.totalQuantity),
         },
       ],
     };
@@ -153,26 +153,6 @@ const ReportDashboard: React.FC = () => {
 
   const getInventoryOption = () => {
     if (!inventoryData) return {};
-    const items = inventoryData.list || inventoryData || [];
-    // If it's already categorized data
-    if (Array.isArray(items) && items.length > 0 && items[0].name) {
-      return {
-        tooltip: { trigger: 'item' },
-        legend: { orient: 'vertical', left: 'left' },
-        series: [
-          {
-            name: '库存状态',
-            type: 'pie',
-            radius: '60%',
-            data: items.map((item: any) => ({
-              name: item.name,
-              value: item.count || item.value,
-            })),
-          },
-        ],
-      };
-    }
-    // Otherwise build from summary fields
     return {
       tooltip: { trigger: 'item' },
       legend: { orient: 'vertical', left: 'left' },

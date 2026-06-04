@@ -69,6 +69,7 @@ export class ImportExportService {
     let failed = 0;
     const errors: string[] = [];
 
+    const rows: { rowNumber: number; name: string; sku: string; categoryId: number; price: number; costPrice: number }[] = [];
     sheet.eachRow((row, rowNumber) => {
       if (rowNumber === 1) return;
 
@@ -83,23 +84,27 @@ export class ImportExportService {
         return;
       }
 
-      this.productRepo
-        .save(
+      rows.push({ rowNumber, name, sku, categoryId, price, costPrice: Number(row.getCell(5).value) || 0 });
+    });
+
+    for (const row of rows) {
+      try {
+        await this.productRepo.save(
           this.productRepo.create({
-            name,
-            sku,
-            categoryId,
-            price,
-            costPrice: Number(row.getCell(5).value) || 0,
+            name: row.name,
+            sku: row.sku,
+            categoryId: row.categoryId,
+            price: row.price,
+            costPrice: row.costPrice,
             status: 1,
           }),
-        )
-        .then(() => success++)
-        .catch((e) => {
-          failed++;
-          errors.push(`第${rowNumber}行: ${e.message}`);
-        });
-    });
+        );
+        success++;
+      } catch (e: any) {
+        failed++;
+        errors.push(`第${row.rowNumber}行: ${e.message}`);
+      }
+    }
 
     return { success, failed, errors };
   }

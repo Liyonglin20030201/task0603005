@@ -258,9 +258,22 @@ export class InventoryService {
   }
 
   async updateWarningThreshold(productId: number, threshold: number) {
-    const inventory = await this.inventoryRepo.findOne({ where: { productId } });
-    if (!inventory) throw new NotFoundException('库存记录不存在');
-    inventory.warningThreshold = threshold;
-    return this.inventoryRepo.save(inventory);
+    const maxRetries = 3;
+
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      const inventory = await this.inventoryRepo.findOne({ where: { productId } });
+      if (!inventory) throw new NotFoundException('库存记录不存在');
+
+      const result = await this.inventoryRepo.update(
+        { id: inventory.id, version: inventory.version },
+        { warningThreshold: threshold, version: inventory.version + 1 },
+      );
+
+      if (result.affected === 1) {
+        return this.inventoryRepo.findOne({ where: { productId } });
+      }
+    }
+
+    throw new BusinessException('预警阈值更新冲突，请重试');
   }
 }
