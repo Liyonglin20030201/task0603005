@@ -14,6 +14,12 @@ import AdminList from './pages/admin/AdminList';
 import RoleList from './pages/role/RoleList';
 import LogList from './pages/log/LogList';
 import ReportDashboard from './pages/report/ReportDashboard';
+import NotificationList from './pages/notification/NotificationList';
+import ShipmentList from './pages/shipment/ShipmentList';
+import ForecastList from './pages/forecast/ForecastList';
+import CampaignList from './pages/campaign/CampaignList';
+import CampaignForm from './pages/campaign/CampaignForm';
+import CampaignDetail from './pages/campaign/CampaignDetail';
 import AuthGuard from './components/AuthGuard';
 
 function App() {
@@ -43,6 +49,13 @@ function App() {
         <Route path="roles" element={<RoleList />} />
         <Route path="logs" element={<LogList />} />
         <Route path="reports" element={<ReportDashboard />} />
+        <Route path="notifications" element={<NotificationList />} />
+        <Route path="shipments" element={<ShipmentList />} />
+        <Route path="forecast" element={<ForecastList />} />
+        <Route path="campaigns" element={<CampaignList />} />
+        <Route path="campaigns/create" element={<CampaignForm />} />
+        <Route path="campaigns/:id/edit" element={<CampaignForm />} />
+        <Route path="campaigns/:id" element={<CampaignDetail />} />
       </Route>
     </Routes>
   );

@@ -147,3 +147,75 @@ export interface OperationLogInfo {
   userAgent: string;
   createdAt: string;
 }
+
+export interface ShipmentEvent {
+  status: string;
+  location: string;
+  time: string;
+  description?: string;
+}
+
+export interface ShipmentInfo {
+  id: number;
+  orderId: number;
+  orderNo?: string;
+  trackingNo: string;
+  carrier: string;
+  status: string;
+  estimatedDelivery: string | null;
+  statusHistory: ShipmentEvent[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CampaignInfo {
+  id: number;
+  name: string;
+  type: string;
+  status: string;
+  startTime: string;
+  endTime: string;
+  rules: object;
+  budget: number;
+  usedBudget: number;
+  description: string;
+  productCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CampaignProductInfo {
+  id: number;
+  campaignId: number;
+  productId: number;
+  productName?: string;
+  campaignPrice: number;
+  stock: number;
+  soldCount: number;
+}
+
+export interface NotificationInfo {
+  id: number;
+  type: string;
+  title: string;
+  content: string;
+  level: string;
+  recipientId: number | null;
+  isRead: boolean;
+  metadata: object | null;
+  createdAt: string;
+}
+
+export interface ForecastInfo {
+  productId: number;
+  productName: string;
+  productSku: string;
+  currentStock: number;
+  avgDailySales7: number;
+  avgDailySales14: number;
+  avgDailySales30: number;
+  predictedDemand: number;
+  daysOfStockLeft: number;
+  recommendedReorder: number;
+  confidence: 'high' | 'medium' | 'low';
+}

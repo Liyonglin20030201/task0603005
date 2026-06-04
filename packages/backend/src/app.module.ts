@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
@@ -14,6 +15,10 @@ import { CouponModule } from './modules/coupon/coupon.module';
 import { ReportModule } from './modules/report/report.module';
 import { LogModule } from './modules/log/log.module';
 import { ImportExportModule } from './modules/import-export/import-export.module';
+import { NotificationModule } from './modules/notification/notification.module';
+import { ShipmentModule } from './modules/shipment/shipment.module';
+import { ForecastModule } from './modules/forecast/forecast.module';
+import { CampaignModule } from './modules/campaign/campaign.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { OperationLogInterceptor } from './common/interceptors/operation-log.interceptor';
@@ -21,6 +26,7 @@ import { OperationLogInterceptor } from './common/interceptors/operation-log.int
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    EventEmitterModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -48,6 +54,10 @@ import { OperationLogInterceptor } from './common/interceptors/operation-log.int
     ReportModule,
     LogModule,
     ImportExportModule,
+    NotificationModule,
+    ShipmentModule,
+    ForecastModule,
+    CampaignModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: HttpExceptionFilter },

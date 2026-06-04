@@ -103,3 +103,39 @@ export const importExportApi = {
     request.get('/import-export/orders/export', { params: { status }, responseType: 'blob' }),
   exportUsers: () => request.get('/import-export/users/export', { responseType: 'blob' }),
 };
+
+export const notificationApi = {
+  list: (params: any) => request.get('/notifications', { params }),
+  unreadCount: () => request.get('/notifications/unread-count'),
+  markRead: (ids: number[]) => request.put('/notifications/mark-read', { ids }),
+  markAllRead: () => request.put('/notifications/mark-all-read'),
+  create: (data: any) => request.post('/notifications', data),
+  delete: (id: number) => request.delete(`/notifications/${id}`),
+};
+
+export const shipmentApi = {
+  list: (params: any) => request.get('/shipments', { params }),
+  detail: (id: number) => request.get(`/shipments/${id}`),
+  byOrder: (orderId: number) => request.get(`/shipments/order/${orderId}`),
+  create: (data: any) => request.post('/shipments', data),
+  updateTracking: (id: number, data: any) => request.put(`/shipments/${id}/tracking`, data),
+};
+
+export const forecastApi = {
+  list: (params: any) => request.get('/forecast', { params }),
+  detail: (productId: number, params?: any) => request.get(`/forecast/${productId}`, { params }),
+  summary: (leadTime?: number) => request.get('/forecast/summary', { params: { leadTime } }),
+};
+
+export const campaignApi = {
+  list: (params: any) => request.get('/campaigns', { params }),
+  detail: (id: number) => request.get(`/campaigns/${id}`),
+  create: (data: any) => request.post('/campaigns', data),
+  update: (id: number, data: any) => request.put(`/campaigns/${id}`, data),
+  delete: (id: number) => request.delete(`/campaigns/${id}`),
+  addProducts: (id: number, data: any) => request.post(`/campaigns/${id}/products`, data),
+  removeProduct: (id: number, productId: number) => request.delete(`/campaigns/${id}/products/${productId}`),
+  activate: (id: number) => request.put(`/campaigns/${id}/activate`),
+  pause: (id: number) => request.put(`/campaigns/${id}/pause`),
+  end: (id: number) => request.put(`/campaigns/${id}/end`),
+};

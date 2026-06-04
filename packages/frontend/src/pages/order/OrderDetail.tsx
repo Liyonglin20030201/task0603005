@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Descriptions, Table, Button, Tag, Space, Modal, Input, message } from 'antd';
+import { Card, Descriptions, Table, Button, Tag, Space, Modal, Input, Timeline, message } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { orderApi } from '../../api';
+import { orderApi, shipmentApi } from '../../api';
 
 const statusColorMap: Record<string, string> = {
   pending_payment: 'orange',
@@ -35,6 +35,7 @@ export default function OrderDetail() {
   const [targetStatus, setTargetStatus] = useState('');
   const [reason, setReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [shipment, setShipment] = useState<any>(null);
 
   const fetchOrder = async () => {
     setLoading(true);
@@ -55,10 +56,20 @@ export default function OrderDetail() {
     }
   };
 
+  const fetchShipment = async () => {
+    try {
+      const res: any = await shipmentApi.byOrder(Number(id));
+      setShipment(res);
+    } catch {
+      setShipment(null);
+    }
+  };
+
   useEffect(() => {
     if (id) {
       fetchOrder();
       fetchTransitions();
+      fetchShipment();
     }
   }, [id]);
 
@@ -166,6 +177,31 @@ export default function OrderDetail() {
           pagination={false}
         />
       </Card>
+
+      {shipment && (
+        <Card title="物流信息" style={{ marginBottom: 16 }}>
+          <Descriptions column={2} style={{ marginBottom: 16 }}>
+            <Descriptions.Item label="快递公司">{shipment.carrier}</Descriptions.Item>
+            <Descriptions.Item label="快递单号">{shipment.trackingNo}</Descriptions.Item>
+            <Descriptions.Item label="当前状态">
+              <Tag>{shipment.status}</Tag>
+            </Descriptions.Item>
+            <Descriptions.Item label="预计送达">{shipment.estimatedDelivery || '-'}</Descriptions.Item>
+          </Descriptions>
+          <Timeline
+            items={(shipment.statusHistory || []).slice().reverse().map((item: any) => ({
+              children: (
+                <div>
+                  <div><strong>{item.status}</strong></div>
+                  {item.location && <div>{item.location}</div>}
+                  {item.description && <div>{item.description}</div>}
+                  <div style={{ color: '#999', fontSize: 12 }}>{item.time}</div>
+                </div>
+              ),
+            }))}
+          />
+        </Card>
+      )}
 
       {transitions.length > 0 && (
         <Card title="状态操作">
