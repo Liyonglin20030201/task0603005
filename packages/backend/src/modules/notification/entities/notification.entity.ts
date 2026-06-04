@@ -20,6 +20,9 @@ export class Notification {
   @Column({ name: 'recipient_id', nullable: true })
   recipientId: number;
 
+  @Column({ name: 'recipient_role', length: 50, nullable: true })
+  recipientRole: string;
+
   @Column({ name: 'is_read', default: false })
   isRead: boolean;
 

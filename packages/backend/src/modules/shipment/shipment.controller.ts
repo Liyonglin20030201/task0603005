@@ -8,6 +8,7 @@ import { QueryShipmentDto } from './dto/query-shipment.dto';
 import { PermissionGuard } from '../../common/guards/permission.guard';
 import { RequirePermission } from '../../common/decorators/permission.decorator';
 import { OperationLogMeta } from '../../common/decorators/operation-log.decorator';
+import { CurrentAdmin } from '../../common/decorators/current-admin.decorator';
 import { PERMISSIONS } from '@ecommerce/shared';
 
 @ApiTags('物流追踪')
@@ -50,7 +51,7 @@ export class ShipmentController {
   @RequirePermission(PERMISSIONS.SHIPMENT_UPDATE)
   @OperationLogMeta('shipment', 'updateTracking')
   @ApiOperation({ summary: '更新物流状态' })
-  updateTracking(@Param('id') id: number, @Body() dto: UpdateTrackingDto) {
-    return this.shipmentService.updateTracking(id, dto);
+  updateTracking(@Param('id') id: number, @Body() dto: UpdateTrackingDto, @CurrentAdmin('id') adminId: number) {
+    return this.shipmentService.updateTracking(id, dto, adminId);
   }
 }

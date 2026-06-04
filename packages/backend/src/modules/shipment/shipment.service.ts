@@ -108,7 +108,7 @@ export class ShipmentService {
     return shipment;
   }
 
-  async updateTracking(id: number, dto: UpdateTrackingDto): Promise<Shipment> {
+  async updateTracking(id: number, dto: UpdateTrackingDto, operatorId?: number): Promise<Shipment> {
     const shipment = await this.findOne(id);
     const now = new Date().toISOString();
 
@@ -117,6 +117,7 @@ export class ShipmentService {
       location: dto.location || '',
       time: now,
       description: dto.description,
+      operatorId: operatorId || null,
     });
     shipment.status = dto.status;
 
@@ -124,6 +125,7 @@ export class ShipmentService {
 
     if (dto.status === 'delivered') {
       const orderRepo = this.dataSource.getRepository('Order');
+
       await orderRepo
         .createQueryBuilder()
         .update()
@@ -131,11 +133,18 @@ export class ShipmentService {
         .where('id = :id AND status = :status', { id: shipment.orderId, status: 'shipping' })
         .execute();
 
+      await orderRepo
+        .createQueryBuilder()
+        .update()
+        .set({ status: 'completed', completedAt: new Date() })
+        .where('id = :id AND status = :status', { id: shipment.orderId, status: 'shipped' })
+        .execute();
+
       this.eventEmitter.emit(NOTIFICATION_EVENTS.ORDER_STATUS_CHANGED, {
         orderId: shipment.orderId,
         orderNo: '',
         oldStatus: 'shipping',
-        newStatus: 'shipped',
+        newStatus: 'completed',
       });
     }
 

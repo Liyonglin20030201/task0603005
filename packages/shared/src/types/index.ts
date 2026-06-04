@@ -153,6 +153,7 @@ export interface ShipmentEvent {
   location: string;
   time: string;
   description?: string;
+  operatorId?: number | null;
 }
 
 export interface ShipmentInfo {
@@ -201,6 +202,7 @@ export interface NotificationInfo {
   content: string;
   level: string;
   recipientId: number | null;
+  recipientRole: string | null;
   isRead: boolean;
   metadata: object | null;
   createdAt: string;

@@ -19,6 +19,7 @@ export class NotificationListener {
       title: '库存预警',
       content: `商品「${event.productName}」库存不足，当前库存${event.quantity}，预警阈值${event.warningThreshold}`,
       level: 'warning',
+      recipientRole: 'operator',
       metadata: { productId: event.productId },
     });
   }
@@ -30,6 +31,7 @@ export class NotificationListener {
       title: '订单状态变更',
       content: `订单 ${event.orderNo} 状态已从「${event.oldStatus}」变更为「${event.newStatus}」`,
       level: 'info',
+      recipientRole: 'operator',
       metadata: { orderId: event.orderId },
     });
   }
@@ -41,6 +43,7 @@ export class NotificationListener {
       title: '活动状态变更',
       content: `营销活动「${event.campaignName}」状态已变更为「${event.status}」`,
       level: 'info',
+      recipientRole: 'admin',
       metadata: { campaignId: event.campaignId },
     });
   }

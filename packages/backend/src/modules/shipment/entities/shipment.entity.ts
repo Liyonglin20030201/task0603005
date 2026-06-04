@@ -25,7 +25,7 @@ export class Shipment {
   estimatedDelivery: Date;
 
   @Column({ name: 'status_history', type: 'json' })
-  statusHistory: Array<{ status: string; location: string; time: string; description?: string }>;
+  statusHistory: Array<{ status: string; location: string; time: string; description?: string; operatorId?: number | null }>;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

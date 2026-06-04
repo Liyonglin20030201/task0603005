@@ -83,8 +83,20 @@ export class CampaignService {
 
   async remove(id: number): Promise<void> {
     const campaign = await this.findOne(id);
-    if (campaign.status !== 'draft') {
-      throw new BadRequestException('只能删除草稿状态的活动');
+    if (campaign.status === 'active') {
+      throw new BadRequestException(
+        `活动「${campaign.name}」正在进行中，无法删除。请先暂停或结束活动后再删除。`,
+      );
+    }
+    if (campaign.status === 'paused') {
+      throw new BadRequestException(
+        `活动「${campaign.name}」当前为暂停状态，无法直接删除。请先将活动结束后再删除。`,
+      );
+    }
+    if (campaign.status === 'ended') {
+      throw new BadRequestException(
+        `活动「${campaign.name}」已结束，包含历史数据不可删除。如需清理请联系管理员。`,
+      );
     }
     await this.campaignProductRepo.delete({ campaignId: id });
     await this.campaignRepo.delete(id);

@@ -24,6 +24,11 @@ export class CreateNotificationDto {
   @IsNumber()
   recipientId?: number;
 
+  @ApiPropertyOptional({ description: '接收角色编码，如 operator/admin，按角色精准推送' })
+  @IsOptional()
+  @IsString()
+  recipientRole?: string;
+
   @ApiPropertyOptional({ description: '额外数据' })
   @IsOptional()
   metadata?: object;
