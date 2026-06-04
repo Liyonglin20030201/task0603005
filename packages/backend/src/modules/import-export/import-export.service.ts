@@ -89,7 +89,7 @@ export class ImportExportService {
 
     for (const row of rows) {
       try {
-        await this.productRepo.save(
+        const product = await this.productRepo.save(
           this.productRepo.create({
             name: row.name,
             sku: row.sku,
@@ -97,6 +97,15 @@ export class ImportExportService {
             price: row.price,
             costPrice: row.costPrice,
             status: 1,
+          }),
+        );
+        await this.inventoryRepo.save(
+          this.inventoryRepo.create({
+            productId: product.id,
+            quantity: 0,
+            lockedQuantity: 0,
+            warningThreshold: 10,
+            version: 0,
           }),
         );
         success++;
